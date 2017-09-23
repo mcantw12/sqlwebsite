@@ -64,7 +64,7 @@ query<-"SELECT playerID, avg(HR) FROM Batting GROUP BY playerID HAVING avg(HR)>3
 sqldf(query)
 ```
 
-#Other Things
+#Joins
 Example 1: 
 Seperated by command for clarity.
 ```{r}
@@ -96,5 +96,37 @@ HAVING avg(salary)>1000000 and nameFirst='Bob'"
 sqldf(query)
 ```
 
+Example 4
+```{r}
+query<-"SELECT nameFirst,nameLast,name,Batting.yearID,Batting.teamID 
+FROM (Batting inner join Master
+ON Batting.playerID=Master.playerID) INNER JOIN Teams
+ON Batting.teamID=Teams.teamID and Batting.yearId=Teams.yearID
+WHERE Batting.playerID='ruthba01'"
 
+sqldf(query)
+```
+
+Example 5
+```{r}
+query<-"SELECT nameFirst, nameLast, sum(HR) FROM Batting
+INNER JOIN Master on Batting.playerID=Master.playerID
+GROUP BY Batting.playerID
+HAVING sum(HR)>=600
+ORDER BY sum(HR) desc"
+
+sqldf(query)
+```
+
+Example 6
+```{r}
+query<-"SELECT nameFirst, nameLast, avg(salary) FROM Salaries
+INNER JOIN Master ON Salaries.playerID=Master.playerID
+WHERE nameFirst='Bob'
+GROUP BY Salaries.playerID
+HAVING avg(salary)>1000000
+ORDER BY avg(salary) desc"
+
+sqldf(query)
+```
 

@@ -344,8 +344,8 @@ sqldf(query)</code></pre>
 ## 12 schmimi01 30.44444
 ## 13 abreujo02 30.33333</code></pre>
 </div>
-<div id="other-things" class="section level1">
-<h1>Other Things</h1>
+<div id="joins" class="section level1">
+<h1>Joins</h1>
 <p>Example 1: Seperated by command for clarity.</p>
 <pre class="r"><code>query &lt;-&quot;SELECT nameFirst, nameLast, name, Batting.yearID, Batting.HR
 FROM (Batting INNER JOIN Master
@@ -406,6 +406,72 @@ sqldf(query)</code></pre>
 ## 6       Bob Tewksbury     1288182
 ## 7       Bob     Welch     1930417
 ## 8       Bob   Wickman     2635813</code></pre>
+<p>Example 4</p>
+<pre class="r"><code>query&lt;-&quot;SELECT nameFirst,nameLast,name,Batting.yearID,Batting.teamID 
+FROM (Batting inner join Master
+ON Batting.playerID=Master.playerID) INNER JOIN Teams
+ON Batting.teamID=Teams.teamID and Batting.yearId=Teams.yearID
+WHERE Batting.playerID='ruthba01'&quot;
+
+sqldf(query)</code></pre>
+<pre><code>##    nameFirst nameLast             name yearID teamID
+## 1       Babe     Ruth   Boston Red Sox   1914    BOS
+## 2       Babe     Ruth   Boston Red Sox   1915    BOS
+## 3       Babe     Ruth   Boston Red Sox   1916    BOS
+## 4       Babe     Ruth   Boston Red Sox   1917    BOS
+## 5       Babe     Ruth   Boston Red Sox   1918    BOS
+## 6       Babe     Ruth   Boston Red Sox   1919    BOS
+## 7       Babe     Ruth New York Yankees   1920    NYA
+## 8       Babe     Ruth New York Yankees   1921    NYA
+## 9       Babe     Ruth New York Yankees   1922    NYA
+## 10      Babe     Ruth New York Yankees   1923    NYA
+## 11      Babe     Ruth New York Yankees   1924    NYA
+## 12      Babe     Ruth New York Yankees   1925    NYA
+## 13      Babe     Ruth New York Yankees   1926    NYA
+## 14      Babe     Ruth New York Yankees   1927    NYA
+## 15      Babe     Ruth New York Yankees   1928    NYA
+## 16      Babe     Ruth New York Yankees   1929    NYA
+## 17      Babe     Ruth New York Yankees   1930    NYA
+## 18      Babe     Ruth New York Yankees   1931    NYA
+## 19      Babe     Ruth New York Yankees   1932    NYA
+## 20      Babe     Ruth New York Yankees   1933    NYA
+## 21      Babe     Ruth New York Yankees   1934    NYA
+## 22      Babe     Ruth    Boston Braves   1935    BSN</code></pre>
+<p>Example 5</p>
+<pre class="r"><code>query&lt;-&quot;SELECT nameFirst, nameLast, sum(HR) FROM Batting
+INNER JOIN Master on Batting.playerID=Master.playerID
+GROUP BY Batting.playerID
+HAVING sum(HR)&gt;=600
+ORDER BY sum(HR) desc&quot;
+
+sqldf(query)</code></pre>
+<pre><code>##   nameFirst  nameLast sum(HR)
+## 1     Barry     Bonds     762
+## 2      Hank     Aaron     755
+## 3      Babe      Ruth     714
+## 4      Alex Rodriguez     696
+## 5    Willie      Mays     660
+## 6       Ken   Griffey     630
+## 7       Jim     Thome     612
+## 8     Sammy      Sosa     609</code></pre>
+<p>Example 6</p>
+<pre class="r"><code>query&lt;-&quot;SELECT nameFirst, nameLast, avg(salary) FROM Salaries
+INNER JOIN Master ON Salaries.playerID=Master.playerID
+WHERE nameFirst='Bob'
+GROUP BY Salaries.playerID
+HAVING avg(salary)&gt;1000000
+ORDER BY avg(salary) desc&quot;
+
+sqldf(query)</code></pre>
+<pre><code>##   nameFirst  nameLast avg(salary)
+## 1       Bob   Wickman     2635813
+## 2       Bob     Welch     1930417
+## 3       Bob     Howry     1804583
+## 4       Bob    Horner     1416667
+## 5       Bob Tewksbury     1288182
+## 6       Bob   Stanley     1067500
+## 7       Bob     Boone     1047580
+## 8       Bob     Ojeda     1035926</code></pre>
 </div>
 
 
