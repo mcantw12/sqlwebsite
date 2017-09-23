@@ -1,0 +1,100 @@
+---
+title: "SQL"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Filtering Columns and Rows
+In SQL columns and rows can both be filtered. Columns are filtered with the SELECT command and rows are filtered with the WHERE command. Let's try using the Lahman database.
+First, load the Lahman and SQLDF packages.
+```{r, message=FALSE, warning=FALSE}
+library(Lahman)
+library(sqldf)
+```
+Next, enter the desired filters into a query.
+```{r}
+query<-"SELECT playerID, teamID, HR, yearID FROM Batting WHERE teamID='NYA' and yearID=1927"
+sqldf(query)
+```
+
+Here are some additional examples with different parameters.
+Example 1: Shows players, team, and year with at least 40 home runs
+```{r}
+query<-"SELECT playerID, HR, teamID, yearID FROM Batting WHERE teamID='NYA' and HR>=40"
+sqldf(query)
+```
+Example 2: Displays players, team, and year with more than 40 home runs but less than 60 strike outs
+```{r}
+query<-"SELECT playerID, HR, SO, teamID, yearID FROM Batting WHERE HR>40 and SO<60"
+sqldf(query)
+```
+Example 3: Shows Phillies players and year with more than 30 home runs in the 1970's
+```{r}
+query<-"SELECT playerID, teamID, HR, yearID FROM Batting WHERE teamID='PHI' and HR>30 and yearID<1980 and yearID>=1970"
+sqldf(query)
+```
+
+
+#Group By
+Example 1
+```{r}
+query<- "SELECT playerID, SO, AB, teamID FROM Batting WHERE SO<10 and AB>400 ORDER BY SO"
+sqldf(query)
+```
+
+#Aggrigation
+Example 1: Combine column by sum
+```{r}
+query<-"SELECT playerID, sum(HR) FROM Batting WHERE playerID='ruthba01' GROUP BY playerID"
+sqldf(query)
+```
+Example 2: Filtering with Groups: use HAVING after GROUP instead of WHERE in equations where there is no grouping
+```{r}
+query<-"SELECT playerID, sum(HR), teamID FROM Batting GROUP BY playerID HAVING sum(HR)>=600 ORDER BY sum(HR) DESC"
+sqldf(query)
+```
+Some other ways to group data are as follows: avg() max() min()
+
+Example 3
+```{r}
+query<-"SELECT playerID, avg(HR) FROM Batting GROUP BY playerID HAVING avg(HR)>30 ORDER BY avg(HR) DESC"
+sqldf(query)
+```
+
+#Other Things
+Example 1: 
+Seperated by command for clarity.
+```{r}
+query <-"SELECT nameFirst, nameLast, name, Batting.yearID, Batting.HR
+FROM (Batting INNER JOIN Master
+ON Batting.playerID=Master.playerID) INNER JOIN Teams
+ON Batting.teamID=Teams.teamID AND Batting.yearID=Teams.yearID
+WHERE Batting.playerID='ruthba01'"
+sqldf(query)
+```
+
+
+Example 2
+```{r}
+query<-"SELECT nameFirst, nameLast, sum(HR)
+FROM Batting INNER JOIN Master ON Batting.playerID=Master.playerID
+GROUP BY Batting.playerID
+HAVING sum(HR)>600"
+sqldf(query)
+```
+
+
+Example 3
+```{r}
+query<-"SELECT nameFirst, nameLast, avg(salary)
+FROM Salaries INNER JOIN Master ON Salaries.playerID=Master.playerID
+GROUP BY Master.playerID
+HAVING avg(salary)>1000000 and nameFirst='Bob'"
+sqldf(query)
+```
+
+
+
